@@ -1,1 +1,14 @@
-text
+name: Container Build
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'src/**'
+      - 'include/**'
+      - 'CMakeLists.txt'
+      - 'Dockerfile*'
+      - '.GitHub/workflows/container-build.yml'
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
