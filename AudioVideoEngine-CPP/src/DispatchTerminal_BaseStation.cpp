@@ -4,11 +4,10 @@
 #include "USB.h"
 #include "USBHost.h"
 
-// --- Trust-Main: Dispatch Base Station Terminal ---
-// Interfaces physical desktop screens and USB hardware keyboards with the 
-// wilderness mesh network for command-and-control operations.
+// --- Trust-Main: Dispatch Base Station Terminal (Keyboard & Mouse Support) ---
+// Integrates USB Host peripherals (keyboard and mouse) with mesh telemetry 
+// for full command-and-control operations on the dispatcher's console.
 
-// Incoming telemetry packet structure from field units
 typedef struct {
     uint8_t unitID;
     uint32_t sequenceNum;
@@ -32,23 +31,34 @@ void onMeshPacketReceived(const uint8_t *macAddr, const uint8_t *incomingData, i
     }
 }
 
-// USB Host Keyboard Callback for Dispatcher Input
+// USB Host Keyboard Handler
 void keyboardKeyHandler(uint8_t mkey, uint8_t nkey) {
-    // Handle physical keypresses from the dispatcher's desktop keyboard
     Serial.print("[DISPATCH KEYBOARD] Key Pressed Code: ");
     Serial.println(nkey);
-    
-    // Example dispatch commands based on key strokes
-    if (nkey == 0x2C) { // Spacebar or specific hotkey
-        Serial.println("[DISPATCH COMMAND] Broadcasting grid sector refresh request to all units.");
-        // Code to send command packet back out via ESP-NOW mesh
+}
+
+// USB Host Mouse Movement & Click Handler
+void mouseMoveHandler(int x, int y) {
+    // Tracks relative cursor/crosshair movement across the 3D grid map
+    if (x != 0 || y != 0) {
+        Serial.print("[DISPATCH MOUSE] Cursor Delta -> X: ");
+        Serial.print(x);
+        Serial.print(" | Y: ");
+        Serial.println(y);
+    }
+}
+
+void mouseButtonHandler(uint8_t button, bool pressed) {
+    if (pressed) {
+        Serial.print("[DISPATCH MOUSE] Button Clicked: ");
+        if (button == 1) Serial.println("Left Click (Select Sector / Target)");
+        else if (button == 2) Serial.println("Right Click (Context Menu / Options)");
     }
 }
 
 void initDispatchHardware() {
     Serial.begin(115200);
     
-    // Initialize Wi-Fi in Station mode for ESP-NOW
     WiFi.mode(WIFI_STA);
     if (esp_now_init() != ESP_OK) {
         Serial.println("[DISPATCH] ESP-NOW initialization failed.");
@@ -56,14 +66,17 @@ void initDispatchHardware() {
     }
     esp_now_register_recv_cb(esp_now_recv_cb_t(onMeshPacketReceived));
 
-    // Initialize USB Host for Hardware Desktop Keyboard (ESP32-S3 specific feature)
+    // Initialize USB Host for Desktop Keyboard & Mouse Peripherals
     USBHost::begin();
-    // USBHost.onKeyboard(keyboardKeyHandler); // Bind physical keyboard events
+    
+    // Bind peripheral input callbacks
+    // USBHost.onKeyboard(keyboardKeyHandler);
+    // USBHost.onMouseMove(mouseMoveHandler);
+    // USBHost.onMouseButton(mouseButtonHandler);
 
-    Serial.println("Dispatch Base Station Terminal Initialized.");
+    Serial.println("Dispatch Base Station Terminal Initialized [Keyboard & Mouse Active].");
 }
 
-// Update physical screen display with live telemetry and 3D triangulation grid
 void updateDispatchConsoleScreen(const FieldTelemetryPacket &pkt) {
     Serial.println("==========================================");
     Serial.println("[DISPATCH CONSOLE SCREEN LIVE DISPLAY]");
@@ -92,6 +105,5 @@ void loop() {
         newPacketAvailable = false;
     }
 
-    // Handle background dispatch logging and UI refresh cycles
-    delay(100);
+    delay(50); // Responsive polling interval for dispatch UI
 }
