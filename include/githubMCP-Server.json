@@ -1,115 +1,19 @@
 {
-  "servers": {
+  "mcpServers": {
     "github": {
-      "type": "http",
-      "url": "https://api.githubcopilot.com/mcp/",
-      "headers": {
-        "X-MCP-Insiders": "true"
-      }
-    }
-  }
-}
-
-{
-  "servers": {
-    "github": {
-      "type": "http",
-      "url": "https://api.githubcopilot.com/mcp/",
-      "headers": {
-        "X-MCP-Insiders": "true"
-      }
-    }
-  }
-}
-{
-  "servers": {
-    "github": {
-      "type": "http",
-      "url": "https://api.githubcopilot.com/mcp/insiders"
-    }
-  }
-}
-
-"github": {
-    "command": "docker",
-    "args": [
-    "run",
-    "-i",
-    "--rm",
-    "-e",
-    "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",
-    "-e",
-    "GITHUB_HOST",
-    "ghcr.io/github/github-mcp-server"
-    ],
-    "env": {
-        "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": "${input:github_token}",
-        "GITHUB_HOST": "https://<your GHES or ghe.com domain name>"
-    }
-}
-
-
-{
-  "mcp": {
-    "servers": {
-      "github": {
-        "command": "docker",
-        "args": [
-          "run",
-          "-i",
-          "--rm",
-          "-p",
-          "127.0.0.1:8085:8085",
-          "-e",
-          "GITHUB_OAUTH_CALLBACK_PORT",
-          "ghcr.io/github/github-mcp-server"
-        ],
-        "env": {
-          "GITHUB_OAUTH_CALLBACK_PORT": "8085"
-        }
-      }
-    }
-  }
-}
-
-{
-  "mcp": {
-    "inputs": [
-      {
-        "type": "promptString",
-        "id": "github_token",
-        "description": "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",
-        "password": true
-      }
-    ],
-    "servers": {
-      "github": {
-        "command": "docker",
-        "args": [
-          "run",
-          "-i",
-          "--rm",
-          "-e",
-          "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",
-          "ghcr.io/github/github-mcp-server"
-        ],
-        "env": {
-          "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": "${input:github_token}"
-        }
-      }
-    }
-  }
-}
-
-{
-  "mcp": {
-    "servers": {
-      "github": {
-        "command": "/path/to/github-mcp-server",
-        "args": ["stdio"],
-        "env": {
-          "GITHUB_PERSONAL_ACCESS_TOKEN": "<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>"
-        }
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "-p",
+        "127.0.0.1:8085:8085",
+        "-e",
+        "GITHUB_OAUTH_CALLBACK_PORT",
+        "ghcr.io/github/github-mcp-server"
+      ],
+      "env": {
+        "GITHUB_OAUTH_CALLBACK_PORT": "8085"
       }
     }
   }
