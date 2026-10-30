@@ -1,6 +1,28 @@
-# config.yaml (inside Trust-Main, Trust-Shell, etc.)
+# ==========================================
+# AUDIO-VIDEO ENGINE CONFIGURATION FILE
+# ==========================================
+
+project:
+  name: "AudioVideoEngine-CPP"
+  version: "1.0.0"
+  role: "Hardware Audio/Video Processing"
+
+# Security & Handshake Settings (Links with Diagnostic Core)
 security:
   handshake_protocol: "HMAC-SHA256"
   target_diagnostic_repo: "my_diagnostic_project"
   shared_secret_env_var: "REPO_SHARED_SECRET"
   token_expiration_seconds: 300
+
+# Hardware & Stream Processing Settings
+hardware:
+  sample_rate: 16000
+  channels: 1
+  stream_buffer_ms: 250
+  expected_endpoint: "local_pipe_or_socket_3"
+
+# Logging Configuration
+logging:
+  level: "INFO"
+  format: "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+  save_to_file: true
