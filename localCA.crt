@@ -1,0 +1,15 @@
+server {
+    listen 443 ssl;
+    server_name trustdale.internal;
+
+    ssl_certificate     /path/to/server.crt;
+    ssl_certificate_key /path/to/server.key;
+
+    # Require and verify client certificate
+    ssl_client_certificate /path/to/localCA.crt;
+    ssl_verify_client      on;
+
+    location / {
+        proxy_pass http://localhost:8080;
+    }
+}
