@@ -5,9 +5,12 @@ server {
     ssl_certificate     /path/to/server.crt;
     ssl_certificate_key /path/to/server.key;
 
-    # Require and verify client certificate
+    # Point directly to your internal Trust root CA for client verification
     ssl_client_certificate /path/to/localCA.crt;
     ssl_verify_client      on;
+
+    # Optional: Enable client certificate depth check if chaining
+    ssl_verify_depth       2;
 
     location / {
         proxy_pass http://localhost:8080;
