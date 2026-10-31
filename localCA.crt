@@ -1,18 +1,34 @@
-server {
-    listen 443 ssl;
-    server_name trustdale.internal;
+#include <filesystem>
+#include <iostream>
 
-    ssl_certificate     /path/to/server.crt;
-    ssl_certificate_key /path/to/server.key;
+namespace fs = std::filesystem;
 
-    # Point directly to your internal Trust root CA for client verification
-    ssl_client_certificate /path/to/localCA.crt;
-    ssl_verify_client      on;
+struct EnginePathConfig {
+    fs::path caCertPath;
+    fs::path clientCertPath;
+    fs::path clientKeyPath;
 
-    # Optional: Enable client certificate depth check if chaining
-    ssl_verify_depth       2;
+    bool ResolvePaths() {
+        // Example: Resolve relative to the running executable or standard config directory
+        fs::path baseDir = fs::current_path();
 
-    location / {
-        proxy_pass http://localhost:8080;
+        caCertPath = baseDir / "localCA.crt"; // In AudioVideoEngine-CPP repo
+        
+        // Pointing to the Trust-Shell managed certs directory (adjust relative depth as needed)
+        fs::path trustShellDir = baseDir.parent_path() / "Trust-Shell";
+        clientCertPath = trustShellDir / "client.crt";
+        clientKeyPath = trustShellDir / "client.key";
+
+        // Validate existence before passing to OpenSSL
+        if (!fs::exists(caCertPath)) {
+            std::cerr << "[Error] Missing localCA.crt at: " << caCertPath << std::endl;
+            return false;
+        }
+        if (!fs::exists(clientCertPath) || !fs::exists(clientKeyPath)) {
+            std::cerr << "[Error] Missing Trust-Shell client identity files." << std::endl;
+            return false;
+        }
+
+        return true;
     }
-}
+};
